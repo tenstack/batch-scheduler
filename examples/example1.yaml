@@ -1,0 +1,37 @@
+apiVersion: batch.scheduler.tencent.com/v1
+kind: PodGroup
+metadata:
+  name: group1
+  namespace: default
+spec:
+  minMember: 9
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: web-group-valid1
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  podManagementPolicy: Parallel
+  serviceName: "nginx"
+  replicas: 9
+  template:
+    metadata:
+      labels:
+        group.batch.scheduler.tencent.com: "group1"
+        app: nginx
+        type: node
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+          ports:
+            - containerPort: 80
+              name: web
+          resources:
+            limits:
+              cpu: "1"
+            requests:
+              cpu: "1"

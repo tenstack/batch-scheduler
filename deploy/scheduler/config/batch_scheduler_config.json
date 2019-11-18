@@ -1,0 +1,45 @@
+{
+  "kind": "KubeSchedulerConfiguration",
+  "apiVersion": "kubescheduler.config.k8s.io/v1alpha1",
+  "clientConnection": {
+    "kubeconfig": "/var/run/kubernetes/admin.kubeconfig"
+  },
+  "plugins": {
+    "preFilter": {
+      "enabled": [
+        {
+          "name": "batch-scheduler"
+        }
+      ]
+    },
+    "permit": {
+      "enabled": [
+        {
+          "name": "batch-scheduler"
+        }
+      ]
+    },
+    "postBind": {
+      "enabled": [
+        {
+          "name": "batch-scheduler"
+        }
+      ]
+    },
+    "queueSort": {
+      "enabled": [
+        {
+          "name": "batch-scheduler"
+        }
+      ]
+    }
+  },
+  "pluginConfig": [
+    {
+      "name": "batch-scheduler",
+      "args": {
+        "kube_config": "/var/run/kubernetes/admin.kubeconfig"
+      }
+    }
+  ]
+}
