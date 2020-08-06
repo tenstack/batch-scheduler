@@ -2,9 +2,9 @@
 
 ## Background
 
-Currently, though the default scheduler in kubernetes cannot ensure a group of pods can be scheduled, it would
- schedule the pods. Under some scene, it would waste resources since some pods need work together, like `spark`,
- `tensorflow` and so on. So, batch-scheduler is aimed at solving the issue.
+Currently, through the default scheduler of Kubernetes, we cannot ensure a group of pods scheduled at the same time
+. Under some scene, it would waste resources since some pods need work together, like `spark`, `tensorflow` and so on
+. So, batch-scheduler is aimed at solving the issue.
 
 ## Method
 
@@ -26,11 +26,10 @@ A group consists of 5 pods. The batch-scheduler would not schedule any pod until
 
  - scene2
 Only 6 cpu exist in the cluster. Two groups require 5 cpus and 5 cpus are submitted, then only one and at least one
- group would be scheduler
+ group would be scheduled.
 
-How to keep light weight. We named a CRD [PodGroup](./pkg/apis/podgroup/v1/types.go). When we would to running a group
- of pods, just need submit a
- `PodGroup`, e.g. `group1` into the cluster. The pods needs to run as a group should only add a label `group.batch
+How to keep light-weight. We named a CRD [PodGroup](./pkg/apis/podgroup/v1/types.go). When we would to running a group
+ of pods, just need submit a `PodGroup`, e.g. `group1` into the cluster. The pods needs to run as a group should only add a label named: `group.batch
  .scheduler.tencent.com: group1` 
 
 ### Main Progress
@@ -41,16 +40,18 @@ How to keep light weight. We named a CRD [PodGroup](./pkg/apis/podgroup/v1/types
 2. `Less`: this interface decides the sequence of pods. Currently, pods having higher `Priority` would be scheduled
  first. If pods have same the priority, PodGroup Creation time would be compared.
 
-3. `Permit`: it is used for approving a list of pods. 
+3. `Permit`: it is used for approving a pod or denying one. If a pod can be scheduled, but the number of pods belongs
+ to the same group has not reached the min requested, it returns `Wait`. If a pod cannot be scheduled, it returns
+  `Unschedulable`.
 
-4. It is better to set MaxScheduleTime for a PodGroup. If one of the pods belong to the same PodGroup times out, the
- others pods would also be reject.
+4. It is better to set MaxScheduleTime for a PodGroup. If one of the pods belong to the same PodGroup times out
+, other pods would also be rejected.
 
 ## Build
 
 ```
-git clone git@github.com/tenstack/batch-scheduler.git
-make build
+# git clone git@github.com/tenstack/batch-scheduler.git
+# make build
 ```
 
 ## Deploy
@@ -74,7 +75,7 @@ Default config has been written, but `kube_config` in it should be changed to yo
 
 ## Example
 
-This example show the resource race scene. Only 8 cpu exist in the cluster, and 0.9 has been occupied.
+This example shows the resource race scene. Only 8 cpu exist in the cluster, and 0.9 has been occupied.
 
 ```$xslt
 Allocated resources:
@@ -171,7 +172,7 @@ spec:
 ```$xslt
 # kubectl apply -f sts-group-valid-race.yaml
 ```
-- Result
+- Results
 ```$xslt
 [root@cwd-dev ~]# kubectl get pod
 NAME                            READY   STATUS              RESTARTS   AGE
